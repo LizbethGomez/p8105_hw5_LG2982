@@ -59,7 +59,7 @@ Create a tidy dataframe containing data from all participants, including the sub
 file_names_df = tibble(
   file_names = list.files(path = "./data/Problem_1"))
 
-# function to read csv files
+
 
 read_data <- function(file_name) {
   
@@ -67,7 +67,7 @@ read_data <- function(file_name) {
   
 }
 
-# data frame with nested results from each file 
+
 study_data_import = 
   file_names_df %>% 
   mutate(
@@ -76,9 +76,34 @@ study_data_import =
 
 - Tidy the result; manipulate file names to include control arm and subject ID, make sure weekly observations are “tidy”, and do any other tidying that’s necessary
 ```{r}
+study_data_tidy = 
+  study_data_import %>% 
+  unnest() %>% 
+  gather(key = week, value = observation, week_1:week_8) %>% 
+  separate(file_names, into = c("study_arm", "subject_id"), sep = "\\_") %>% 
+  mutate(
+    subject_id = str_replace(subject_id, "\\.csv", ""),
+    subject_id = str_remove(subject_id, "^0+"), 
+    week = str_replace(week, "\\week_", ""), 
+    study_arm = recode(study_arm, con = "control", exp = "experimental")) 
 
+study_data_tidy
 ```
 
 
 
 Make a spaghetti plot showing observations on each subject over time, and comment on differences between group
+
+```{r}
+study_data_tidy %>% 
+  ggplot(aes(x = week, y = observation, color = subject_id, group = subject_id)) + 
+  geom_line() +
+  facet_grid(~study_arm) +
+  labs(
+    title = "Observations Over 8 Weeks", 
+    x = "Week", 
+    y = "Observation", 
+    color = "Participant") + 
+  viridis::scale_color_viridis(discrete = TRUE)
+```
+
