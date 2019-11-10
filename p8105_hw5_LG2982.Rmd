@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-## Problem 1
+## Problem 1:
 
 #### Data Import
 ```{r}
@@ -114,12 +114,29 @@ study_data_tidy %>%
 Comments: As shown by the graphs, the experimental arm in general has a higher number of observation than the control. 
 
 
-## Problem 2
+## Problem 3:
 
 
 ```{r, Problem 3}
 
+sim_regression = function(n, beta0 = 2,  beta1 = 0) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 50)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
 
+```
 
+```{r}
+sim_regression(n =30)
 ```
 
